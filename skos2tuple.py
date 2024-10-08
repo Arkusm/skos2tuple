@@ -13,6 +13,8 @@ def main(argv):
     
     url = None
     lang = None
+    help = f'{os.path.basename(__file__)} -i <URL> -l <language code>'
+    
     durl = "https://e-teachingorg.github.io/skos-vocabularies/example.org/w3i/index.json"
     # url = "https://skohub.io/dini-ag-kim/schulfaecher/heads/main/w3id.org/kim/schulfaecher/index.json"
     # url = "https://skohub.io/dini-ag-kim/educationalLevel/heads/main/w3id.org/kim/educationalLevel/index.json"
@@ -21,11 +23,11 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"hi:l:",["ifile=", "llang="])
     except getopt.GetoptError:
-        print(f'{os.path.basename(__file__)} -i <URL> -l <language code>')
+        print(help)
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print (f'{os.path.basename(__file__)} -i <URL> -l <language code>')
+            print(help)
             sys.exit()
         elif opt in ("-i", "--ifile"):
             url = arg
