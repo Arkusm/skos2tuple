@@ -40,11 +40,11 @@ def main(argv):
             title = None
             if 'prefLabel' in top:
                 title = top['prefLabel'].get(lang, None)
-            tid = top.get('id', None)            
-            tterm = [tid, title]
-            print(tterm[1])
-            vocab.append(tuple(tterm))      
-            get_narrower(top)
+                tid = top.get('id', None)            
+                tterm = [tid, title]
+                print(tterm[1])
+                vocab.append(tuple(tterm))      
+                get_narrower(top)
     
     print()    
     pp = pprint.PrettyPrinter(indent=4)
