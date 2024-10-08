@@ -1,36 +1,46 @@
 import getopt
 import json
+import os
 import pprint
 import requests
 import sys
 
 
 vocab = []
-lang = 'de'
 
 
 def main(argv):
     
-    arg = None
-    url = "https://e-teachingorg.github.io/skos-vocabularies/example.org/w3i/index.json"
+    url = None
+    lang = None
+    durl = "https://e-teachingorg.github.io/skos-vocabularies/example.org/w3i/index.json"
     # url = "https://skohub.io/dini-ag-kim/schulfaecher/heads/main/w3id.org/kim/schulfaecher/index.json"
     # url = "https://skohub.io/dini-ag-kim/educationalLevel/heads/main/w3id.org/kim/educationalLevel/index.json"
     # url = "https://skohub.io/dini-ag-kim/hochschulfaechersystematik/heads/master/w3id.org/kim/hochschulfaechersystematik/scheme.json"
    
     try:
-        opts, args = getopt.getopt(argv,"hi:o:",["ifile="])
+        opts, args = getopt.getopt(argv,"hi:l:",["ifile=", "llang="])
     except getopt.GetoptError:
-        print ('test.py -i <URL>')
+        print(f'{os.path.basename(__file__)} -i <URL> -l <language code>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print ('skos2tuple.py -i <URL>')
+            print (f'{os.path.basename(__file__)} -i <URL> -l <language code>')
             sys.exit()
-        if opt in ("-i", "--ifile"):
+        elif opt in ("-i", "--ifile"):
             url = arg
-            print('Try to get a Skos vocabulary from the following URL:', url)
-    if not arg:
+            print('Set URL to:', url)
+        elif opt in ("-l", "--llang"):
+            lang = arg
+            print('Set language to', lang)
+    if not url:
+        url = durl
         print('Try the default URL:', url)
+    if not lang:
+        lang = 'de'
+        print('Try the default language:', lang)
+        
+        
     
     skos_dict = skos_api(url)    
 
@@ -39,12 +49,13 @@ def main(argv):
         for top in skos_dict['hasTopConcept']:
             title = None
             if 'prefLabel' in top:
-                title = top['prefLabel'].get(lang, None)
+                title = top['prefLabel'].get(
+                    lang, f'title not available in language {lang}')
                 tid = top.get('id', None)            
                 tterm = [tid, title]
                 print(tterm[1])
                 vocab.append(tuple(tterm))      
-                get_narrower(top)
+                get_narrower(top, lang)
     
     print()    
     pp = pprint.PrettyPrinter(indent=4)
@@ -61,7 +72,7 @@ def skos_api(url):
     return sd
 
 
-def get_narrower(layer, n=0):
+def get_narrower(layer, lang, n=0):
     num = '  ' * n
     if 'narrower' in layer: 
         for narrower in layer['narrower']:
@@ -73,7 +84,7 @@ def get_narrower(layer, n=0):
                 print(f'{num} -- {title}')        
                 term = [id, title]
                 vocab.append(tuple(term)) 
-                get_narrower(narrower, n+1)
+                get_narrower(narrower, lang, n+1)
    
 if __name__ == "__main__":
     main(sys.argv[1:])
